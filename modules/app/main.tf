@@ -1,3 +1,29 @@
+# -----------------------------
+# Namespace
+# -----------------------------
+resource "kubernetes_namespace_v1" "this" {
+  metadata {
+    name = var.namespace
+  }
+}
+
+# -----------------------------
+# Service Account (IRSA)
+# -----------------------------
+resource "kubernetes_service_account_v1" "this" {
+  metadata {
+    name      = var.service_account_name
+    namespace = kubernetes_namespace_v1.this.metadata[0].name
+
+    annotations = {
+      "eks.amazonaws.com/role-arn" = var.role_arn
+    }
+  }
+}
+
+# -----------------------------
+# Deployment
+# -----------------------------
 resource "kubernetes_deployment_v1" "app" {
   metadata {
     name      = "s3-app"
@@ -31,6 +57,7 @@ resource "kubernetes_deployment_v1" "app" {
     }
   }
 
+  # 🔒 Prevent identity / metadata drift issues
   lifecycle {
     ignore_changes = [
       metadata[0].annotations,
