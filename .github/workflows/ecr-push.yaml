@@ -1,0 +1,41 @@
+name: Build & Push Docker Image to ECR
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-south-2
+  ECR_REPOSITORY: s3-irsa-app
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::442880721659:role/github-actions-ecr-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push Docker image
+        run: |
+          IMAGE_URI=$(aws ecr describe-repositories \
+            --repository-names $ECR_REPOSITORY \
+            --query 'repositories[0].repositoryUri' \
+            --output text)
+
+          docker build -t $IMAGE_URI:latest .
+          docker push $IMAGE_URI:latest
