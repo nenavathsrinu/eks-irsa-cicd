@@ -1,9 +1,18 @@
-name: Build & Push Docker Image to ECR
-
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Choose action"
+        required: true
+        default: "apply"
+        type: choice
+        options:
+          - apply
+          - destroy
+
 
 env:
   AWS_REGION: ap-south-2
