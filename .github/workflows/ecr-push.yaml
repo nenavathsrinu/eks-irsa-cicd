@@ -37,5 +37,5 @@ jobs:
             --query 'repositories[0].repositoryUri' \
             --output text)
 
-          docker build -t $IMAGE_URI:latest .
+          docker build -t $IMAGE_URI:latest ./app
           docker push $IMAGE_URI:latest
