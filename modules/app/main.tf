@@ -1,19 +1,3 @@
-resource "kubernetes_namespace_v1" "this" {
-  metadata {
-    name = var.namespace
-  }
-}
-
-resource "kubernetes_service_account_v1" "this" {
-  metadata {
-    name      = var.service_account_name
-    namespace = kubernetes_namespace_v1.this.metadata[0].name
-    annotations = {
-      "eks.amazonaws.com/role-arn" = var.role_arn
-    }
-  }
-}
-
 resource "kubernetes_deployment_v1" "app" {
   metadata {
     name      = "s3-app"
@@ -45,5 +29,12 @@ resource "kubernetes_deployment_v1" "app" {
         }
       }
     }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations,
+      metadata[0].labels
+    ]
   }
 }
