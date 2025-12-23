@@ -13,14 +13,23 @@ resource "kubernetes_config_map_v1" "aws_auth" {
           "system:bootstrappers",
           "system:nodes"
         ]
+      },
+      {
+        rolearn = "arn:aws:iam::442880721659:role/github-actions-ecr-role"
+        username = "github-actions"
+        groups = [
+          "system:masters"
+        ]
       }
     ])
 
     mapUsers = yamlencode([
       {
-        userarn  = "arn:aws:iam::442880721659:user/dev-user"
-        username = "dev-user"
-        groups   = ["system:masters"]
+        userarn = "arn:aws:iam::442880721659:user/terraform"
+        username = "terraform"
+        groups = [
+          "system:masters"
+        ]
       }
     ])
   }
