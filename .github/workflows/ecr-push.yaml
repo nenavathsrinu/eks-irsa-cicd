@@ -39,3 +39,14 @@ jobs:
 
           docker build -f app/Dockerfile -t $IMAGE_URI:latest app
           docker push $IMAGE_URI:latest
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: .
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: .
+        run: terraform plan
