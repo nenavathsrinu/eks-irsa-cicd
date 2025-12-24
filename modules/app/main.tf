@@ -22,7 +22,7 @@ resource "kubernetes_service_account_v1" "this" {
 }
 
 # -----------------------------
-# Deployment
+# Deployment (FIXED)
 # -----------------------------
 resource "kubernetes_deployment_v1" "app" {
   metadata {
@@ -52,12 +52,18 @@ resource "kubernetes_deployment_v1" "app" {
         container {
           name  = "app"
           image = var.image
+
+          # ✅ KEEP CONTAINER RUNNING (fix for CrashLoopBackOff)
+          command = [
+            "sh",
+            "-c",
+            "echo 'Hello from IRSA-enabled pod' && sleep infinity"
+          ]
         }
       }
     }
   }
 
-  # 🔒 Prevent identity / metadata drift issues
   lifecycle {
     ignore_changes = [
       metadata[0].annotations,
